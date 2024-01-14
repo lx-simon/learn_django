@@ -32,5 +32,11 @@ urlpatterns = [
     # 用户登录
     path('login/', views.login),
     # path('logout/', views.logout),
+    path('orm/', views.orm),
+
+    # 案例：用户管理
+    path('info/list/', views.info_list),
+    path('info/add/', views.info_add),
+    path('info/delete/', views.info_delete),
 
 ]

@@ -1,4 +1,6 @@
 from django.shortcuts import redirect, render, HttpResponse
+from app01.models import Department, UserInfo
+
 # render --> return html, 寻找模板，并返回
 # 默认情况
 # 重要，函数
@@ -70,3 +72,66 @@ def login(request):
         else:
             # return HttpResponse("登录失败")
             return render(request, "login.html", {"msg": "用户名或密码错误"})
+        
+def orm(request):
+    # 测试ORM操作表中的数据
+    # ### 1.新建 ###
+    # Department.objects.create(title="销售部")
+    # Department.objects.create(title="IT部")
+    # Department.objects.create(title="运营部")
+
+    # UserInfo.objects.create(name="xll", password="123", age=18)
+    # UserInfo.objects.create(name="xll2", password="123", age=18)
+
+    # ### 2.删除 ###
+    # filter 加筛选条件
+    # UserInfo.objects.filter(name="xll2").delete()
+    # UserInfo.objects.all().delete()
+
+    # ### 3.获取数据 ###
+    # data_list = [行，行，行], QuerySet数据
+    data_list = UserInfo.objects.all()
+    # 3.1 获取符合条件的所有数据
+    # print(data_list)
+    # for obj in data_list:
+    #     print(obj.id, obj.name, obj.password)
+    # data_list = UserInfo.objects.filter(name="xll")
+    # print(data_list)
+    ## 3.2获取第一条数据[对象]
+    data = UserInfo.objects.filter(name="xll").first()
+    print(data.id, data.name, data.password, data.age)
+
+    ## #### 4.更新数据 ####
+    UserInfo.objects.all().update(password="999")
+    UserInfo.objects.filter(name="xll").update(password="123456")
+    
+
+
+    return HttpResponse("成功")
+
+def info_list(request):
+    # 1.获取数据库中所有的用户信息
+    # [对象, ]
+    data_list = UserInfo.objects.all()
+    print(data_list)
+    return render(request, "info_list.html", {"data_list": data_list} )
+
+def info_add(request):
+    if request.method == "GET":
+        return render(request, 'info_add.html')
+    # 获取用户提交的数据
+    user = request.POST.get("user")
+    pwd = request.POST.get('pwd')
+    age = request.POST.get('age')
+
+    # 添加到数据库
+    UserInfo.objects.create(name=user, password=pwd, age=age)
+    # return HttpResponse("添加成功")
+    # 自动跳转
+    return redirect("/info/list/")
+
+def info_delete(request):
+    nid = request.GET.get("nid")
+    UserInfo.objects.filter(id=nid).delete()
+    # return HttpResponse("删除成功")
+    return redirect("/info/list/")
