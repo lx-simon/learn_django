@@ -8,6 +8,10 @@ class Department(models.Model):
     # id = models.BigAutoField(verbose_name='ID', primary_key=True)
     title = models.CharField(verbose_name='标题', max_length=32)
 
+    def __str__(self):# 面向对象，打印对象返回值
+        return self.title
+
+
 class UserInfo(models.Model):
     """员工表"""
     name = models.CharField(verbose_name="姓名", max_length=16)
@@ -33,5 +37,4 @@ class UserInfo(models.Model):
 
     gender_choices = ((1, "男"), (2, "女"))
     gender = models.SmallIntegerField(verbose_name="性别", choices=gender_choices)
-    
     
