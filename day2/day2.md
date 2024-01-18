@@ -77,7 +77,6 @@ show databases;
 
 Django中提供Form和ModelForm组件（方便）
 
-
 ### 6.1 部门列表
 
 ![1705245605910](image/day2/1705245605910.png)

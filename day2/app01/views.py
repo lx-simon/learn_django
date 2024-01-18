@@ -1,7 +1,9 @@
+import random
 import re
 from django.shortcuts import render, redirect
 from app01 import models
 from django import forms
+from django.utils.safestring import mark_safe
 # Create your views here.
 def depart_list(request):
     """ 部门列表 """
@@ -145,16 +147,48 @@ def user_delete(request, nid):
 
 def pretty_list(request):
     """ 靓号列表 """
+    # 临时增加一些数据
+    # for i in range(300):
+    #     models.PrettyNum.objects.create(mobile=str(int("13800138000")+i), price=random.randint(1,100), level=1, status=2)
+
     # select * from table order by id asc
     # select * from table order by level desc
     data_dict = {}
     search_data = request.GET.get("q", "")
     if search_data:
         data_dict = {"mobile__contains":search_data}
+
+    from app01.utils.pagination import Pagination
+
     queryset = models.PrettyNum.objects.filter(**data_dict).order_by("-level")
+
+    page_object = Pagination(request, queryset)
+
+    page_queryset = page_object.queryset
+
+    # # 1.根据用户想访问的页面，计算出值
+    # page_size = 10
+    # page = int(request.GET.get("page", 1))
+    # start = (page-1) * page_size
+    # end = page * page_size
+
+    # queryset = models.PrettyNum.objects.filter(**data_dict).order_by("-level")[page_object.start:page_object.end]
     # print(queryset)
     # queryset = models.PrettyNum.objects.all().order_by("-level")
-    return render(request, 'pretty_list.html', {'queryset': queryset, "search_data": search_data})
+
+    # # 数据总条数
+    # total_count = models.PrettyNum.objects.filter(**data_dict).order_by("-level").count()
+    # total_page_count, div = divmod(total_count, page_size)
+    # if div: # 有余数，多一页
+    #     total_page_count += 1
+
+    page_string = page_object.html()
+
+    context = {"search_data": search_data,
+               'queryset': page_queryset, # 分完页的数据
+               "page_string":page_string, # 页面
+            }
+    return render(request, 'pretty_list.html', context)
 
 
 from django.core.validators import RegexValidator
