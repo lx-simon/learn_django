@@ -34,6 +34,15 @@ class Pagination(object):
         :param plus: 显示当前页面的前5页，后5页
         :return:
         """
+
+        import copy
+        from django.http.request import QueryDict
+        query_dict = copy.deepcopy(request.GET)
+        query_dict._mutable = True
+        # query_dict.setlist("page", [])
+        # url参数page设置并保留当前存在的其它参数
+        self.query_dict = query_dict
+        self.page_param = page_param
         page = request.GET.get(page_param, "1")
         if page.isdecimal():
             page = int(page)
@@ -80,35 +89,42 @@ class Pagination(object):
         
 
         # 页码
-        page_str_list = []
+        page_str_list = []        
 
         # 首页
-        page_str_list.append('<li><a href="?page=1">首页</a></li>')
+        self.query_dict.setlist(self.page_param, [1])
+        page_str_list.append('<li><a href="?{0}">首页</a></li>'.format(self.query_dict.urlencode()))
 
         # 上一页
         if self.page > 1:
-            prev = '<li><a href="?page={0}" aria-label="Previous"><span aria-hidden="true">«</span></a></li>'.format(self.page-1)
+            self.query_dict.setlist(self.page_param, [self.page-1])
+            prev = '<li><a href="?{0}" aria-label="Previous"><span aria-hidden="true">«</span></a></li>'.format(self.query_dict.urlencode())
         else:
-            prev = '<li class="disabled"><a href="?page={0}" aria-label="Previous"><span aria-hidden="true">«</span></a></li>'.format(1)
+            self.query_dict.setlist(self.page_param, [1])
+            prev = '<li class="disabled"><a href="?{0}" aria-label="Previous"><span aria-hidden="true">«</span></a></li>'.format(self.query_dict.urlencode())
         page_str_list.append(prev)
 
         # 页面
         for i in range(start_page,end_page+1):
-            if i == self.page:
-                ele = '<li class="active"><a href="?page={0}">{0}</a></li>'.format(i)
+            self.query_dict.setlist(self.page_param, [i])
+            if i == self.page:  
+                ele = '<li class="active"><a href="?{0}">{1}</a></li>'.format(self.query_dict.urlencode(),i)
             else:
-                ele = '<li><a href="?page={0}">{0}</a></li>'.format(i)
+                ele = '<li><a href="?{0}">{1}</a></li>'.format(self.query_dict.urlencode(),i)
             page_str_list.append(ele)
 
         # 下一页
         if self.page < self.total_page_count:
-            next = '<li><a href="?page={0}" aria-label="Next"><span aria-hidden="true">»</span></a></li>'.format(self.page+1)
+            self.query_dict.setlist(self.page_param, [self.page+1])
+            next = '<li><a href="?{0}" aria-label="Next"><span aria-hidden="true">»</span></a></li>'.format(self.query_dict.urlencode())
         else:
-            next = '<li class="disabled"><a href="?page={0}" aria-label="Next"><span aria-hidden="true">»</span></a></li>'.format(self.total_page_count)
+            self.query_dict.setlist(self.page_param, [self.total_page_count])
+            next = '<li class="disabled"><a href="?{0}" aria-label="Next"><span aria-hidden="true">»</span></a></li>'.format(self.query_dict.urlencode())
         page_str_list.append(next)
 
         # 尾页
-        page_str_list.append('<li><a href="?page={0}">尾页</a></li>'.format(self.total_page_count))
+        self.query_dict.setlist(self.page_param, [self.total_page_count])
+        page_str_list.append('<li><a href="?{0}">尾页</a></li>'.format(self.query_dict.urlencode()))
 
         search_string = '''
         <li>

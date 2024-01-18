@@ -4,6 +4,7 @@ from django.shortcuts import render, redirect
 from app01 import models
 from django import forms
 from django.utils.safestring import mark_safe
+from app01.utils.pagination import Pagination
 # Create your views here.
 def depart_list(request):
     """ 部门列表 """
@@ -62,7 +63,13 @@ def user_list(request):
         # models.Department.objects.filter(id=obj.depart_id).first().title
         # obj.depart.title # 根据id自动关联表中获取那一行数据的对象
 
-    return render(request, 'user_list.html', {'queryset': queryset})
+    page_object = Pagination(request, queryset)
+    context = {
+        "queryset": page_object.queryset, # 分完页的数据
+        "page_string":page_object.html(), # 页面
+    }
+
+    return render(request, 'user_list.html', context)
 
 def user_add(request):
     """ 添加用户 """
@@ -153,6 +160,7 @@ def pretty_list(request):
 
     # select * from table order by id asc
     # select * from table order by level desc
+
     data_dict = {}
     search_data = request.GET.get("q", "")
     if search_data:
