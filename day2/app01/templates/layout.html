@@ -18,6 +18,9 @@
             border-radius: 0;
         }
     </style>
+    {% block css %}{% endblock %}
+
+
 </head>
 <body>
     <!--导航条，直接从bootstrap组件中拿来用-->
@@ -68,6 +71,7 @@
 
 	<!-- <script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script> -->
     <script src="{% static 'plugins/bootstrap-3.4.1/js/bootstrap.min.js' %}"></script>
+    {% block js %}{% endblock %}
     
 </body>
 </html>

@@ -5,6 +5,7 @@ from app01 import models
 from django import forms
 from django.utils.safestring import mark_safe
 from app01.utils.pagination import Pagination
+from app01.utils.bootstrap import BootStrapModelForm
 # Create your views here.
 def depart_list(request):
     """ 部门列表 """
@@ -93,7 +94,7 @@ def user_add(request):
 
 # ################################## ModelForm 实例 #############################
 from django import forms
-class UserModelForm(forms.ModelForm):
+class UserModelForm(BootStrapModelForm):
     name = forms.CharField(min_length=2, label="用户名")
     # password = forms.CharField(label="密码", validators="[A-Za-z0-9]{6,}")
     class Meta:
@@ -105,13 +106,13 @@ class UserModelForm(forms.ModelForm):
         #     "password": forms.PasswordInput({"class":"form-control"}),
         #     "age": forms.TextInput({"class":"form-control"}),
         # }
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        for name, field in self.fields.items():
-            # if name == "password":
-            #     continue
-            # print(name, field)
-            field.widget.attrs = {"class": "form-control", "placeholder": field.label}
+    # def __init__(self, *args, **kwargs):
+    #     super().__init__(*args, **kwargs)
+    #     for name, field in self.fields.items():
+    #         # if name == "password":
+    #         #     continue
+    #         # print(name, field)
+    #         field.widget.attrs = {"class": "form-control", "placeholder": field.label}
 
 def user_model_form_add(request):
     """ 添加用户（ModelForm版本） """
@@ -122,7 +123,7 @@ def user_model_form_add(request):
     # 用户POST提交数据，数据校验
     form = UserModelForm(data=request.POST)
     if form.is_valid():
-        print(form.cleaned_data)
+        # print(form.cleaned_data)
         # 如果数据合法，保存到数据库
         # {'name': '黄钜明', 'password': '12345', 'age': 24, 'account': Decimal('0'), 'create_time': datetime.datetime(2019, 2, 12, 0, 0, tzinfo=zoneinfo.ZoneInfo(key='UTC')), 'gender': 1, 'depart': <Department: IT运维>}
         # models.UserInfo.objects.create(**form.cleaned_data)
@@ -200,7 +201,7 @@ def pretty_list(request):
 
 
 from django.core.validators import RegexValidator
-class PrettyModelForm(forms.ModelForm):
+class PrettyModelForm(BootStrapModelForm):
     # 验证：方式1
     # mobile = forms.CharField(
     #     label="手机号",
@@ -211,13 +212,13 @@ class PrettyModelForm(forms.ModelForm):
         fields = ["mobile", 'price', 'level', 'status']
         # fields = "__all__"
         # exclude = ["level"] # xx字段除外
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        for name, field in self.fields.items():
-            # if name == "password":
-            #     continue
-            # print(name, field)
-            field.widget.attrs = {"class": "form-control", "placeholder": field.label}
+    # def __init__(self, *args, **kwargs):
+    #     super().__init__(*args, **kwargs)
+    #     for name, field in self.fields.items():
+    #         # if name == "password":
+    #         #     continue
+    #         # print(name, field)
+    #         field.widget.attrs = {"class": "form-control", "placeholder": field.label}
 
     # 验证：方式2 (钩子方法，可操作数据库)
     def clean_mobile(self):
@@ -250,16 +251,16 @@ def pretty_add(request):
     return render(request, 'pretty_add.html', {'form': form})
 
 
-class PrettyEditModelForm(forms.ModelForm):
+class PrettyEditModelForm(BootStrapModelForm):
     # mobile = forms.CharField(disabled=True, label="手机号")
     class Meta:
         model = models.PrettyNum
         # 不让它改手机号
         fields = ["mobile", "price", "level", "status"]
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        for name, field in self.fields.items():
-            field.widget.attrs = {"class": "form-control", "placeholder": field.label}
+    # def __init__(self, *args, **kwargs):
+    #     super().__init__(*args, **kwargs)
+    #     for name, field in self.fields.items():
+    #         field.widget.attrs = {"class": "form-control", "placeholder": field.label}
     
     def clean_mobile(self): # 调用钩子函数，需要返回值，否则将其赋为空
         # 当前编辑哪一行的id
