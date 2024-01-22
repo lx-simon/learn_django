@@ -1,8 +1,11 @@
 import random
+
 from django.shortcuts import render, redirect
+
 from app01 import models
 from app01.utils.form import PrettyModelForm
 from app01.utils.form import PrettyEditModelForm
+from app01.utils.pagination import Pagination
 # Create your views here.
 def pretty_list(request):
     """ 靓号列表 """
@@ -17,8 +20,6 @@ def pretty_list(request):
     search_data = request.GET.get("q", "")
     if search_data:
         data_dict = {"mobile__contains":search_data}
-
-    from app01.utils.pagination import Pagination
 
     queryset = models.PrettyNum.objects.filter(**data_dict).order_by("-level")
 
