@@ -5,6 +5,13 @@ from app01.utils.pagination import Pagination
 def admin_list(request):
     """ 管理员列表 """
 
+    # 检查用户是否已经登陆，已登录，继续，未登录，跳转登陆
+    # 用户发送请求，获取cookie随机字符串，那随机字符串查看有没有
+    info = request.session.get("info")
+    # print(info)
+    if not info:
+        return redirect('/login/')
+
     # 搜索
     data_dict = {}
     search_data = request.GET.get("q", "")

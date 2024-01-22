@@ -48,6 +48,11 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    # 中间件，谁在前执行谁，views执行前需要穿过中间件(request)，返回给客户端(resonpse)也需要经过中间件
+    # 栈规则
+    # 'app01.middleware.auth.M1',
+    # 'app01.middleware.auth.M2',
+    'app01.middleware.auth.AuthMiddleware',
 ]
 
 ROOT_URLCONF = 'day2.urls'
