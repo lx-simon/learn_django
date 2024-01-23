@@ -6,7 +6,29 @@
         <div class="panel panel-default">
             <div class="panel-heading">表单</div>
             <div class="panel-body">
-              Panel content
+                <form id="formAdd">
+                    <!-- 通过ajax提交(已经做过过滤)，没必要用csrf_token了 -->
+                    <!-- {% csrf_token %} -->
+                    <div class="clearfix">
+                        {% for field in form %}
+                            <div class="col-xs-6">
+                                <!-- 位置相对，间距15像素 -->
+                                <div class="form-group" style="position: relative;margin-bottom: 20px;">
+                                    <!-- label 就是models 定义verbose_name -->
+                                    <label>{{ field.label }}</label>
+                                    {{ field }}
+                                    <!-- [错误1, 错误2, ...] -->
+                                    <span class="error-msg" style="color:red;position: absolute;"></span>
+                                    <!-- <input type="text" class="form-control" placeholder="" -->
+                                </div>
+                            </div>
+                        {% endfor %}
+                        <div class="col-xs-12">
+                            <button id="btnAdd" type="button" class="btn btn-primary">提 交</button>
+                        </div>
+                    </div>
+                    
+                </form>
             </div>
         </div>
 
@@ -49,6 +71,7 @@
             bindBtn2Event();
             bindBtn3Event();
             bindBtn4Event();
+            bindBtnAdd();
             // 页面框架加载完成之后代码自动执行
             // $("#bt1n").click(function() {
 
@@ -111,6 +134,37 @@
                         console.log(res);// 终端打印response
                         console.log(res.status)
                         console.log(res.data)
+                    }
+
+                })
+            })
+        }
+        
+        function bindBtnAdd() {
+            $("#btnAdd").click(function() {
+
+                $(".error-msg").empty();
+
+
+                $.ajax({
+                    url: "/task/add/",
+                    type: "post",
+                    data: $("#formAdd").serialize(), // 获取表单的所有input值并打包，再发到django后台
+                    dataType: "JSON",// 设置好type, 前端内部会转到对象(点访问)
+                    success: function(res) {//res是后端返回的数据
+                        // console.log(res);// 终端打印response
+                        // console.log(res.status)
+                        // console.log(res.data)
+                        if (res.status) {
+                            alert("添加成功");
+                        } else {
+                            // alert("添加失败");
+                            $.each(res.error, function (name, data) {
+                                // console.log(name, data);
+                                // 找到标签下面<span>，放错误信息
+                                $("#id_"+name).next().text(data[0])
+                            })
+                        }
                     }
 
                 })
