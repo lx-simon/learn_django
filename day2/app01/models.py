@@ -57,3 +57,19 @@ class PrettyNum(models.Model):
 
     status_choices = ((1,"已占用"), (2,"未使用"))
     status = models.SmallIntegerField(choices=status_choices, default=2, verbose_name="状态")   
+
+class Task(models.Model):
+    """ 任务 """
+    level_choices = (
+        (1, "紧急"),
+        (2, "重要"),
+        (3, "临时")
+
+    )
+    level = models.SmallIntegerField(verbose_name="级别", choices=level_choices, default=2)
+    title = models.CharField(verbose_name="标题", max_length=64)
+    detail = models.TextField(verbose_name="详情信息")
+
+    user = models.ForeignKey(verbose_name="负责人", to="Admin", to_field="id", on_delete=models.CASCADE)
+    
+

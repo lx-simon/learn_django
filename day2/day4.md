@@ -229,3 +229,85 @@ if __name__ == '__main__':
  
     pass
 ```
+
+## 15.Ajax请求
+
+浏览器向网站发送请求时：URL和表单的形式提交
+
+- GET
+- POST
+  特点： 页面刷新
+
+除此之外，也可以基于Ajax向后台发送请求(偷偷的发送请求)。
+
+- 依赖jQuery
+- 便携ajax代码
+
+  ```
+  $.ajax(
+  	url:"发送的地址",
+  	type:"post",
+  	data:{
+  		n1:123,
+  		n2:456
+  	},
+  	success:function(res){
+  		console.log(res);
+  	}
+  )
+  ```
+
+### 15.1 request.get请求
+
+```
+{% block js %}
+    <!-- <script>
+        $(function(){
+            $(".btn").click(function(){
+                alert("你点击了按钮");
+            })
+        })
+    </script> -->
+    <script type="text/javascript">
+        function clickMe(){
+            // console.log("点击了按钮")
+            $.ajax({
+                url: "/task/ajax/",
+                type: "get",
+                data: {
+                    n1: 123,
+                    n2: 456
+                },
+                success: function(res) {
+                    console.log(res);// 终端打印response
+                }
+
+            })
+        }
+    </script>
+
+{% endblock %}
+```
+
+```
+def  task_ajax(request):
+    """ 测试ajax请求 """
+    print(request.GET) # <QueryDict: {'n1': ['123'], 'n2': ['456']}>
+    return HttpResponse("成功了")
+```
+
+### 15.2 POST请求
+
+```
+
+```
+
+```
+from django.shortcuts import render, HttpResponse
+from django.views.decorators.csrf import csrf_exempt
+@csrf_exempt # 免除scrf_token验证，ajax post
+def  task_ajax(request):
+    """ 测试ajax请求 """
+    print(request.GET) # <QueryDict: {'n1': ['123'], 'n2': ['456']}>
+    return HttpResponse("成功了")
+```
