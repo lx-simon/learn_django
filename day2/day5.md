@@ -119,3 +119,24 @@ class Order(models.Model):
     admin = models.ForeignKey(verbose_name="管理员", to="Admin", to_field="id", on_delete=models.CASCADE)
   
 ```
+
+
+```python
+# 对象、当前行的所有数据
+row_object = models.Order.objects.filter(id=uid).first()
+row_object.id
+row_object.title
+
+# 字典 {"id": xxx, "title": xxxxx}
+row_dict = models.Order.objects.filter(id=uid).values("id", "title").first()
+
+# queryset = [obj, obj, ]
+queryset = models.Order.objects.all()
+
+# queryset = [dict, dict, ]
+queryset = models.Order.objects.all().values("id", "title")
+
+# queryset = [ (id, title), ]
+queryset = models.Order.objects.all().values_list("id", "title")
+
+```

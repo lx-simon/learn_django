@@ -87,4 +87,4 @@ class Order(models.Model):
     status = models.SmallIntegerField(verbose_name="状态", choices=status_choices, default=1)
 
     admin = models.ForeignKey(verbose_name="管理员", to="Admin", to_field="id", on_delete=models.CASCADE)
-    
+
