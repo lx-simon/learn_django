@@ -48,8 +48,8 @@ def order_delete(request):
     models.Order.objects.filter(id=uid).delete()
     return JsonResponse({"status": True})
 
-def order_edit(request):
-    """ 订单编辑 """
+def order_detail(request):
+    """ 订单编辑显示框 """
     ''' 方式1
     uid = request.GET.get("uid")
     row_object = models.Order.objects.filter(id=uid).first()
@@ -68,4 +68,19 @@ def order_edit(request):
     # 方式2
     uid = request.GET.get("uid")
     row_dict = models.Order.objects.filter(id=uid).values("title", "price", "status").first()
-    return JsonResponse({"status": True, "data": row_dict} if row_dict else {"status": False, "error": "编辑失败，数据不存在"})
+    return JsonResponse({"status": True, "data": row_dict} if row_dict else {"status": False, "error": "数据不存在"})
+
+@csrf_exempt
+def order_edit(request):
+    """ 订单编辑提交 """
+    uid = request.GET.get("uid")
+    row_object = models.Order.objects.filter(id=uid).first()
+    if not row_object:
+        return JsonResponse({"status": False, "tips": "编辑失败，数据不存在，请刷新重试"})
+    
+    form = OrderModelForm(data=request.POST, instance=row_object)
+    if form.is_valid():
+        form.save()
+        return JsonResponse({"status": True})
+    return JsonResponse({"status": False, "error": form.errors})
+    

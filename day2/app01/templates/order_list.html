@@ -3,8 +3,8 @@
 {% block content %}
     <div class="container">
         <div style="margin-bottom: 10px;">
-            <input type="button" value="新建订单" class="btn btn-primary" data-toggle="modal" data-target="#myModal">
-            <input id="btnAdd" type="button" value="新建订单2(事件)" class="btn btn-primary">
+            <input type="button" value="新建订单" class="btn btn-success" data-toggle="modal" data-target="#myModal">
+            <input id="btnAdd" type="button" value="新建订单2(事件)" class="btn btn-success">
         </div>
 
         <div class="panel panel-default">
@@ -200,7 +200,7 @@
                 EDIT_ID = currentID;
                 // 发送Ajax后捕获当前行的相关数据
                 $.ajax({
-                    url: '/order/edit/',
+                    url: '/order/detail/',
                     type: 'get',
                     data: {uid: currentID},
                     dataType: 'JSON',
@@ -265,10 +265,14 @@
                         $("#myModal").modal('hide');
                         location.reload();
                     } else {
-                        // 把错误信息显示到对话框中
-                        $.each(res.error, function(name, error_list){
-                            $("#id_"+name).next().text(error_list[0]);
-                        })
+                        if (res.tips) {
+                            alert(res.tips);
+                        } else {
+                            // 把错误信息显示到对话框中
+                            $.each(res.error, function(name, error_list){
+                                $("#id_"+name).next().text(error_list[0]);
+                            })
+                        }
                     }
                 }
             })
