@@ -1,0 +1,221 @@
+{% extends 'layout.html' %}
+{% load static %}
+
+{% block content %}
+    <div class="container">
+        <div class="panel panel-default">
+            <div class="panel-heading">折线图</div>
+            <div class="panel-body">
+              <div id="m1" style="width: 100%;height: 300px;"></div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-8">
+                <div class="panel panel-default">
+                    <div class="panel-heading">柱状图</div>
+                    <div class="panel-body">
+                        <div id="m2" style="width: 100%;height: 400px;">
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <!-- <div class="col-sm-13"> -->
+                    <div class="panel panel-default">
+                        <div class="panel-heading">饼图</div>
+                        <div class="panel-body">
+                          <div id="m3" style="width: 100%;height: 400px;"></div>
+
+                        </div>
+                    </div>
+                <!-- </div> -->
+            </div>
+
+        </div>
+
+    </div>
+
+{% endblock %}
+
+{% block js %}
+    <script src="{% static 'js/echarts.js' %}"></script>
+    <script type="text/javascript">
+
+        $(function (){
+            initLine();
+            initBar();
+            initPie();
+        })
+
+        /**
+         * 初始化柱状图  
+        */
+
+        function initBar(){
+            // 基于准备好的dom，初始化echarts实例
+            var myChart = echarts.init(document.getElementById('m2'));
+            
+            // 指定图表的配置项和数据
+            var option = {
+                title: {
+                    text: 'ECharts 入门示例',
+                    subtext: "副标题",
+                    textAlign: 'auto',
+                    left: "center"
+                },
+                tooltip: {},
+                legend: {
+                    data: [], //后台获取
+                    bottom: 0
+                },
+                xAxis: {
+                    data: [] //后台获取
+                },
+                yAxis: {},
+                series: [] //后台获取
+            };
+
+            $.ajax({
+                url: '/chart/bar/',
+                type: 'get',
+                dataType: 'JSON',
+                success: function (res){
+                    // 从后台获取的数据，更新到options。
+                    if (res.status) {
+                        option.legend.data = res.data.legend;
+                        option.xAxis.data = res.data.xAxis;
+                        option.series = res.data.series;
+                        // 使用刚指定的配置项和数据显示图表。
+                        myChart.setOption(option);
+                        
+                    }
+                }
+            })
+        }
+
+        /**
+         * 初始化饼图  
+        */
+        function initPie(){
+            // 基于准备好的dom，初始化echarts实例
+            var myChart = echarts.init(document.getElementById('m3'));
+            
+            // 指定图表的配置项和数据
+            var option = {
+                title: {
+                    text: 'Referer of a Website',
+                    subtext: 'Fake Data',
+                    left: 'center'
+                },
+                tooltip: {
+                    trigger: 'item'
+                },
+                legend: {
+                    orient: 'vertical',
+                    left: 'left',
+                    bottom: 0
+                },
+                series: [
+                    {
+                    name: 'Access From',
+                    type: 'pie',
+                    radius: '50%',
+                    data: [],
+                    emphasis: {
+                        itemStyle: {
+                        shadowBlur: 10,
+                        shadowOffsetX: 0,
+                        shadowColor: 'rgba(0, 0, 0, 0.5)'
+                        }
+                    }
+                    }
+                ]
+            };
+
+            $.ajax({
+                url: '/chart/pie/',
+                type: 'get',
+                dataType: 'JSON',
+                success: function (res){
+                    // 从后台获取的数据，更新到options。
+                    if (res.status) {
+                        // console.log(res.data.data)
+                        option.series[0].data = res.data.data
+                        // 使用刚指定的配置项和数据显示图表。
+                        myChart.setOption(option);
+                        
+                    }
+                }
+            })            
+        }
+
+        /**
+         * 初始化折线图  
+        */
+        function initLine(){
+            // 基于准备好的dom，初始化echarts实例
+            var myChart = echarts.init(document.getElementById('m1'));
+            
+            // 指定图表的配置项和数据
+            var option = {
+                title: {
+                    text: 'Stacked Line'
+                },
+                tooltip: {
+                    trigger: 'axis'
+                },
+                legend: {
+                    data: ['Email', 'Union Ads', 'Video Ads', 'Direct', 'Search Engine']
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                toolbox: {
+                    feature: {
+                    saveAsImage: {}
+                    }
+                },
+                xAxis: {
+                    type: 'category',
+                    boundaryGap: false,
+                    data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+                },
+                yAxis: {
+                    type: 'value'
+                },
+                series: [
+                    {
+                    name: 'Email',
+                    type: 'line',
+                    stack: 'Total',
+                    data: [120, 132, 101, 134, 90, 230, 210]
+                    },
+                ]
+            };
+
+            $.ajax({
+                url: '/chart/line/',
+                type: 'get',
+                dataType: 'JSON',
+                success: function (res) {
+                    // 从后台获取的数据，更新到options。
+                    if (res.status) {
+                        console.log(res.data)
+                        option.legend.data = res.data.data_label
+                        option.xAxis.data = res.data.data_xaxis
+                        option.series = res.data.data
+                        // 使用刚指定的配置项和数据显示图表。
+                        myChart.setOption(option);
+                    }
+                }
+            })
+            
+        }
+
+      </script>
+
+{% endblock %}

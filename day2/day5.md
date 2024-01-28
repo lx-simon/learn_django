@@ -140,3 +140,12 @@ queryset = models.Order.objects.all().values("id", "title")
 queryset = models.Order.objects.all().values_list("id", "title")
 
 ```
+
+
+
+## 3.图表
+
+- highchar, 国外。
+- echarts, 国内。
+
+更多参考官方文档。
