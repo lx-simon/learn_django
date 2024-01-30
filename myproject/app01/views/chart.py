@@ -79,3 +79,7 @@ def chart_line(request):
         'data' : data
     }
     return JsonResponse({'status': True, 'data':result})
+
+def chart_highcharts(request):
+    ''' highcharts '''
+    return render(request, 'highcharts.html')

@@ -1,5 +1,8 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, HttpResponse
+from openpyxl import load_workbook
 from app01 import models
+
+
 
 def depart_list(request):
     """ 部门列表 """
@@ -42,4 +45,23 @@ def depart_edit(request, nid):
     # 根据id找到数据库的数据进行更新
     # update参数支持多个 update(xxx=xx, xxx2=xx2)
     models.Department.objects.filter(id=nid).update(title=request.POST.get('title'))
+    return redirect('/depart/list/')
+
+def depart_multi(request):
+    """ 通过文件批量上传 """
+    # 获取文件
+    file_obj = request.FILES.get("exc")
+    print(type(file_obj))
+    # 读取文件
+    wb = load_workbook(file_obj)
+    # 获取sheet
+    sheet = wb.worksheets[0]
+    # 循环获取每一行数据
+    for row in sheet.iter_rows(2):
+        text = row[0].value
+        print(text)
+        exists = models.Department.objects.filter(title=text)
+        if not exists:
+            models.Department.objects.create(title=text)
+
     return redirect('/depart/list/')

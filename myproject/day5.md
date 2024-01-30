@@ -13,8 +13,7 @@
   >>> django-admin startproject mysite
   ```
 
-    注意：Pycharm可以创建，但是需要settings.py中DIR templates删除
-
+  注意：Pycharm可以创建，但是需要settings.py中DIR templates删除
 - 创建app & 注册
 
   ```
@@ -30,8 +29,7 @@
   ]
   ```
 
-    注意：一点要注册，否则app下的models.py写类是，无法在数据库中创建表
-
+  注意：一点要注册，否则app下的models.py写类是，无法在数据库中创建表
 - 配置 静态文件路径 & 模板的路径 （放在app目录下）
 - 配置数据库相关操作（如果使用文件数据库sqlite3，可以跳过数据库配置）
 
@@ -120,7 +118,6 @@ class Order(models.Model):
   
 ```
 
-
 ```python
 # 对象、当前行的所有数据
 row_object = models.Order.objects.filter(id=uid).first()
@@ -141,11 +138,67 @@ queryset = models.Order.objects.all().values_list("id", "title")
 
 ```
 
-
-
 ## 3.图表
 
 - highchar, 国外。
 - echarts, 国内。
 
 更多参考官方文档。
+
+## 4.文件上传
+
+基本操作
+
+```
+        <!-- enctype加上后才支持上传文件内容 -->
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="text" name="username">
+            <input type="file" name="avatar">
+            <input type="submit" value="提交">
+        </form>
+```
+
+```python
+print(request.POST)
+print(request.FILES)
+```
+
+### 案例：批量上传
+
+```
+            <div class="panel-body">
+                <form method="post" enctype="multipart/form-data" action="/depart/multi/">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <input type="file" name="exc">
+                    </div>
+                    <input type="submit" value="上传" class="btn btn-info btn-sm">
+                </form>
+            </div>
+```
+
+```
+def depart_multi(request):
+    """ 通过文件批量上传 """
+    # 获取文件
+    file_obj = request.FILES.get("exc")
+    print(type(file_obj))
+    # 读取文件
+    wb = load_workbook(file_obj)
+    # 获取sheet
+    sheet = wb.worksheets[0]
+    # 循环获取每一行数据
+    for row in sheet.iter_rows(2):
+        text = row[0].value
+        print(text)
+        exists = models.Department.objects.filter(title=text)
+        if not exists:
+            models.Department.objects.create(title=text)
+
+    return redirect('/depart/list/')
+```
+
+### 案例： 混合数据
+
+提交页面时：用户输入数据+文件（数据不为空，报错）
