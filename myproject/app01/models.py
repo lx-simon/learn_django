@@ -88,3 +88,15 @@ class Order(models.Model):
 
     admin = models.ForeignKey(verbose_name="管理员", to="Admin", to_field="id", on_delete=models.CASCADE)
 
+class Boss(models.Model):
+    """ 老板 """
+    name = models.CharField(verbose_name="姓名", max_length=32)
+    age = models.IntegerField(verbose_name="年龄")
+    avatar = models.CharField(verbose_name="头像", max_length=256)
+
+class City(models.Model):
+    """ 城市 """
+    name = models.CharField(verbose_name="城市名称", max_length=32)
+    count = models.IntegerField(verbose_name="人口数量")
+    # 本质上数据库也是CharField
+    img = models.FileField(verbose_name="logo", max_length=256, upload_to="city/")

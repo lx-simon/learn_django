@@ -202,3 +202,180 @@ def depart_multi(request):
 ### 案例： 混合数据
 
 提交页面时：用户输入数据+文件（数据不为空，报错）
+
+- Form生成HTML标签：type+file
+- 表单的验证
+- form.cleaned_data 获取数据+文件名
+
+  ```python
+  class UpForm(BootStrapForm):
+      bootstrap_exclude_fields = ['img']
+
+      name = forms.CharField(label='姓名', max_length=32)
+      age = forms.IntegerField(label='年龄')
+      img = forms.FileField(label='头像')
+
+
+  def upload_form(request):
+      """ 文件Form上传 """
+      title = "Form上传"
+      if request.method == 'GET':
+          form = UpForm()
+          return render(request, 'upload_form.html', {"form":form, 'title':title})
+    
+      form = UpForm(request.POST, request.FILES)
+      if form.is_valid():
+          # print(form.cleaned_data)
+          # 1. 保存图片内容，写入到文件夹并保存到文件的路径种
+          image_object = form.cleaned_data.get('img')
+          # file_path = "app01/image/"
+          db_file_path = os.path.join('static', 'img', image_object.name)
+          file_path = os.path.join('app01', 'static', 'img', image_object.name)
+          with open(file_path, mode='wb') as f:
+              for chunk in image_object.chunks():
+                  f.write(chunk)
+          # 2. 保存图片的路径名保存到数据库中
+          models.Boss.objects.create(
+              name=form.cleaned_data.get('name'),
+              age=form.cleaned_data.get('age'),
+              avatar=db_file_path,
+          )
+          return HttpResponse("上传成功")
+    
+      return render(request, 'upload_form.html', {"form":form, 'title':title})
+  ```
+
+```html
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title"> {{ title }} </h3>
+        </div>
+        <div class="panel-body">
+            <form method="post" enctype="multipart/form-data" novalidate>
+                {% csrf_token %}
+                {% for field in form %}
+                    <div class="form-group">
+                    <!-- label 就是models 定义verbose_name -->
+                    <label>{{ field.label }}</label>
+                    {{ field }}
+                    <!-- [错误1, 错误2, ...] -->
+                    <span style="color:red;">{{ field.errors.0 }}</span>
+                    <!-- <input type="text" class="form-control" placeholder="" -->
+                    </div>
+                {% endfor %}
+
+                <button type="submit" class="btn btn-primary">保 存</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+```
+
+- 写入图片文件非得写道static才能访问? django目前所有静态文件只能放在static目录
+
+在django的开发过程中两个文件夹比较特殊：
+
+- static，存放静态文件的路径，包括：CSS, JS, 项目图片
+- media, 用户上传数据的目录。
+  - 启动media配置
+    - 在urls.py中进行配置
+
+      ```python
+      urlpatterns = [
+          re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}, name="media"),
+      ]
+      ```
+    - 在settings进行配置
+
+      ```python
+      # media文件访问配置
+      MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+      MEDIR_URL = "/media/"
+      ```
+    - ```
+      def upload_form(request):
+          """ 文件Form上传 """
+          title = "Form上传"
+          if request.method == 'GET':
+              form = UpForm()
+              return render(request, 'upload_form.html', {"form":form, 'title':title})
+        
+          form = UpForm(request.POST, request.FILES)
+          if form.is_valid():
+              # print(form.cleaned_data)
+              # 1. 保存图片内容，写入到文件夹并保存到文件的路径种
+              image_object = form.cleaned_data.get('img')
+              # 用os是方便不同操作系统?
+            
+              # 绝对路径
+              # media_path = os.path.join(settings.MEDIA_ROOT, image_object.name)
+              media_path = os.path.join('media', image_object.name)
+
+              with open(media_path, mode='wb') as f:
+                  for chunk in image_object.chunks():
+                      f.write(chunk)
+              # 2. 保存图片的路径名保存到数据库中
+              models.Boss.objects.create(
+                  name=form.cleaned_data.get('name'),
+                  age=form.cleaned_data.get('age'),
+                  avatar=media_path,
+              )
+              return HttpResponse("上传成功")
+        
+          return render(request, 'upload_form.html', {"form":form, 'title':title})
+      ```
+
+### 案例: 混合数据（ModelForm)
+
+- 修改models.py文件
+
+  ```python
+  class City(models.Model):
+      """ 城市 """
+      name = models.CharField(verbose_name="城市名称", max_length=32)
+      count = models.IntegerField(verbose_name="人口数量")
+      # 本质上数据库也是CharField
+      img = models.FileField(verbose_name="logo", max_length=256, upload_to="city/")
+
+  ```
+
+#### 定义ModelForm
+
+```python
+def upload_model_form(request):
+    """ 上传文件和数据(ModelForm) """
+    bootstrap_exclude_fields = ['img']
+
+    title = "ModelForm上传"
+    if request.method == 'GET':
+        form = UpModelForm()
+        return render(request, 'upload_form.html', {"form":form, 'title':title})
+
+```
+
+## 小结
+
+- 自己动手去写
+
+  ```
+  file_object = request.FILES.get("exc")
+  ```
+- Form组件(表单验证)
+
+  ```
+  request.POST
+  xxxxxxxxxxxxxxxx
+  ```
+- ModelForm (表单验证+自己保存数据库+自动保存文件)
+
+  ```
+  - media
+  - Model.py filefield
+  ```
